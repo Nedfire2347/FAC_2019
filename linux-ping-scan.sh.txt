@@ -1,0 +1,25 @@
+# /bin/bash
+RANGE="192.168.17.X";
+
+echo "Starting scan for range $RANGE";
+
+for i in `seq 1 255`; do
+	IP="${RANGE/X/$i}"
+	echo "[*] Pinging $IP...";
+	ping_res="$(ping -W 1 -c1 $IP | grep from | cut -d' ' -f6 | cut -d'=' -f2)"
+	if [ ! -z $ping_res ]; then
+		echo "    Host is up, guessing OS...";
+		if [ "$ping_res" -lt 64 ]; then
+			echo "    OS might be Linux.";
+			continue;
+		fi
+		if [ "$ping_res" -lt 128 ];  then
+			echo "    OS might be Windows.";
+			continue;
+		fi
+		if [ "$ping_res" -lt 255 ];  then
+			echo "    OS might be Cisco.";
+			continue;	
+		fi
+	fi
+done
